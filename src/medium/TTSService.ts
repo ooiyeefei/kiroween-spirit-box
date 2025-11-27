@@ -9,12 +9,7 @@
 import { AUDIO_CONFIG } from '../config/spectral-constants';
 
 export class TTSService {
-  private apiKey: string;
-  private baseUrl = 'https://api.openai.com/v1/audio/speech';
-
-  constructor() {
-    this.apiKey = import.meta.env.VITE_OPENAI_API_KEY || '';
-  }
+  private baseUrl = '/api/tts'; // Use our secure API route
 
   /**
    * Convert text to speech using OpenAI TTS API
@@ -23,26 +18,17 @@ export class TTSService {
   async synthesize(text: string, audioContext: AudioContext): Promise<AudioBuffer> {
     // DEBUG: Log AudioContext state
     console.log('[Spirit Box DEBUG] TTS synthesize called with AudioContext state:', audioContext.state);
-    
-    if (!this.apiKey) {
-      // Fallback: use browser TTS and return silence buffer
-      console.warn('[Spirit Box DEBUG] ⚠️ No API key, using browser TTS fallback');
-      return this.browserTTSFallback(text, audioContext);
-    }
 
     try {
-      console.log('[Spirit Box DEBUG] 🌐 Fetching TTS from OpenAI API...');
+      console.log('[Spirit Box DEBUG] 🌐 Fetching TTS from secure API route...');
       const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'tts-1', // OpenAI TTS model
-          input: text,
+          text: text,
           voice: 'onyx', // Deep, gravelly voice for the ghost
-          response_format: 'mp3',
           speed: 0.75, // Much slower for eerie effect
         }),
       });

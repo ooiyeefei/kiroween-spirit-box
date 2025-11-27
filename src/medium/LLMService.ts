@@ -8,33 +8,19 @@
 import { GHOST_PERSONA } from '../config/spectral-constants';
 
 export class LLMService {
-  private apiKey: string;
-  private baseUrl = 'https://api.openai.com/v1/chat/completions';
-
-  constructor() {
-    this.apiKey = import.meta.env.VITE_OPENAI_API_KEY || '';
-    if (!this.apiKey) {
-      console.warn('[Spirit Box] No OpenAI API key found. Ghost will use fallback responses.');
-    }
-  }
+  private baseUrl = '/api/chat'; // Use our secure API route
 
   /**
    * Generate a paranormal response from Cornelius Blackwood
    */
   async generateResponse(userQuestion: string, entropyLevel: number): Promise<string> {
-    if (!this.apiKey) {
-      return this.getFallbackResponse();
-    }
-
     try {
       const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o', // Latest GPT model for best quality responses
           messages: [
             { role: 'system', content: GHOST_PERSONA },
             { 
